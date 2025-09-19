@@ -61,9 +61,10 @@ public class DatabaseController {
         this.createPropertyIfNotExists(orientClass,propertyName,propertyType,false);
     }
 
-    public OResult queryForResult(String query){
-        OResultSet resultSet = db.query(query);
+    public OResult queryForResult(String query, Map<String, Object> args){
+        OResultSet resultSet = db.query(query, args);
 
+        //System.out.println(resultSet.hasNext());
         if(resultSet.hasNext()){
             return resultSet.next();
         }
@@ -72,18 +73,33 @@ public class DatabaseController {
     }
 
     public OResult getProductById(String rid){
-        return queryForResult("SELECT * FROM Product WHERE @rid = '" + rid + "'");
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", rid);
+
+        return queryForResult("SELECT * FROM Product WHERE @rid = :id", params);
     }
 
-    public OResult getProductByName(String name){ // necessary for removing products from the database or registering new ones
-        return queryForResult("SELECT * FROM Product WHERE name = '" + name + "'");
+    public OResult getProductByNameAndSection(String name, String section){ // necessary for removing products from the database or registering new ones
+        Map<String, Object> params = new HashMap<>();
+        params.put("n", name);
+        params.put("sc", section);
+
+        return queryForResult("SELECT * FROM Product WHERE name = :n AND section = :sc", params);
     }
 
-    public OResultSet getSearchResults(String search){
-        String query = "SELECT * FROM Product WHERE name LIKE '%" + search + "%'";
-        OResultSet resultSet = db.query(query);
+    public OResultSet getSearchResults(String search, String section){
+        Map<String, Object> params = new HashMap<>();
+        params.put("n", "%" + search + "%");
+        String query = "SELECT * FROM Product WHERE name LIKE :n";
 
-        System.out.println(resultSet);
+        if(section != null && !section.isEmpty()){
+            params.put("sc", section);
+            query = query + " AND section = :sc";
+        }
+
+        OResultSet resultSet = db.query(query, params);
+
+        //System.out.println(resultSet);
         while (resultSet.hasNext()) {
             OResult item = resultSet.next();
             System.out.println(item.getProperty("name").toString() + " | ID: " + item.getProperty("@rid").toString());
@@ -93,14 +109,23 @@ public class DatabaseController {
     }
 
     public OResultSet getAllProducts(){
-        return getSearchResults("");
+        return getSearchResults("", null);
     }
+
+    public OResultSet getAllProductsInSection(String section){
+        /* Section examples:
+        "Womens", "Mens", "Kids", "Accessories"
+        This function returns all products within the section.
+        To search within a section, refer to getSearchResults(String search, String section) */
+        
+        return getSearchResults("", section);
+    };
 
     public String calculateTotal(HashMap<OResult, Integer> cartMap){
         double total = 0;
 
         for(Map.Entry<OResult, Integer> entry : cartMap.entrySet()){
-            String stringToParse = entry.getKey().getProperty("price").toString().substring(1).replace(",", "");
+            String stringToParse = entry.getKey().getProperty("price").toString();
 
             total = total+( Double.parseDouble(stringToParse) * entry.getValue() );
         }
@@ -120,7 +145,7 @@ public class DatabaseController {
                 String total = calculateTotal(cartMap);
                 
                 try {
-                    String cmdString = "INSERT INTO Order SET purchase_date = SYSDATE(), contents = '" + user.getProperty("cart_contents").toString() + "', total = '" + total + "', address = '" + address + "', email = '" + user_email + "'";
+                    String cmdString = "INSERT INTO Order SET purchase_date = sysdate(), purchase_time = eval('sysdate().asLong() / 1000'), contents = '" + user.getProperty("cart_contents").toString() + "', total = '" + total + "', address = '" + address + "', email = '" + user_email + "'";
                     db.command(cmdString);
 
                     emptyCart(user_email, password);
@@ -196,10 +221,20 @@ public class DatabaseController {
     }
 
     public OResultSet getOrdersByEmail(String user_email, String password){
-        String query = "SELECT * FROM Order WHERE email = '" + user_email + "'";
+        Map<String, Object> params = new HashMap<>();
+        params.put("e", user_email);
+
+        String query = "SELECT * FROM Order WHERE email = :e";
         OResultSet resultSet = db.query(query);
 
         return resultSet;
+    }
+
+    public OResult getOrderById(String rid){
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", rid);
+
+        return queryForResult("SELECT * FROM Order WHERE order_id = :id", params);
     }
 
     public void printOrdersByEmail(String user_email, String password){
@@ -259,9 +294,36 @@ public class DatabaseController {
         return false;
     }
 
+    public boolean setCartDiscount(String user_email, String password, String code){
+        if(verifyLogin(user_email,password) == true){
+            Map<String, Object> params = new HashMap<>();
+            params.put("c", code);
+            params.put("e", user_email);
+
+            db.command("UPDATE user SET cart_discount = :c WHERE email = :e");
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setShippingOption(String user_email, String password, String option){
+        if(verifyLogin(user_email,password) == true){
+            Map<String, Object> params = new HashMap<>();
+            params.put("s", option);
+            params.put("e", user_email);
+
+            db.command("UPDATE user SET shipping_option = :s WHERE email = :e");
+            return true;
+        }
+        return false;
+    }
+
     public void emptyCart(String user_email, String password){
         if(verifyLogin(user_email,password) == true){
-            db.command("UPDATE user SET cart_contents = '' WHERE email = '" + user_email +"'");
+            Map<String, Object> params = new HashMap<>();
+            params.put("e", user_email);
+
+            db.command("UPDATE user SET cart_contents = '', shipping_option = 'Standard', cart_discount = '' WHERE email = :e");
         }
     }
 
@@ -272,19 +334,17 @@ public class DatabaseController {
 
         try {
 
-            JSONObject jsonObj = new JSONObject(FileUtils.readFileToString(new File("orientdb-ecommerce/src/main/java/emu/cosc472/products.json")));
+            JSONObject jsonObj = new JSONObject(FileUtils.readFileToString(new File("orientdb-ecommerce/src/main/java/emu/cosc481/products.json")));
             JSONArray jsonArray = jsonObj.getJSONArray("products");
             
             int addedRecords = 0;
             int removedRecords = 0;
 
-            ArrayList<String> productNames = new ArrayList<String>();
             for(int i = 0; i < jsonArray.length(); i++){
                 JSONObject obj = jsonArray.getJSONObject(i);
 
-                productNames.add(obj.getString("name"));
-                if(getProductByName(obj.getString("name")) == null){
-                    String cmdString = "INSERT INTO Product SET name = '" + obj.getString("name") + "', description = '" + obj.getString("description") + "', price = '" + obj.getString("price") + "', thumbnail = '" + obj.getString("thumbnail") + "'";
+                if(getProductByNameAndSection(obj.getString("name"),obj.getString("section")) == null){
+                    String cmdString = "INSERT INTO Product SET name = '" + obj.getString("name") + "', section = '" + obj.getString("section") + "', description = '" + obj.getString("description") + "', price = '" + obj.getDouble("price") + "', thumbnail = '" + obj.getString("thumbnail") + "'";
                     db.command(cmdString);
 
                     addedRecords++;
@@ -295,16 +355,26 @@ public class DatabaseController {
             OResultSet resultSet = db.query(query);
 
             while (resultSet.hasNext()) {
-                String itemName = resultSet.next().getProperty("name");
+                OResult nextResult = resultSet.next();
+                String itemName = nextResult.getProperty("name");
+                String itemSection = nextResult.getProperty("section");
 
+                System.out.println(itemSection + " " + itemName);
                 boolean foundInList = false;
-                for(String productName : productNames){
-                    if(productName.equals(itemName))
+                for(int i = 0; i < jsonArray.length(); i++){
+                    JSONObject obj = jsonArray.getJSONObject(i);
+    
+                    if(obj.getString("name").equals(itemName) && obj.getString("section").equals(itemSection))
                         foundInList = true;
                 }
 
                 if(!foundInList){
-                    db.command("DELETE FROM Product WHERE name = '" + itemName + "'");
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("n", itemName);
+                    params.put("sc", itemSection);
+
+                    System.out.println(itemSection);
+                    db.command("DELETE FROM Product WHERE name = :n AND section = :sc", params);
                     removedRecords++;
                 }
             }
@@ -319,9 +389,11 @@ public class DatabaseController {
     public void initialize(){
 
         OClass product = createClassIfNotExists("Product");
-        createPropertyIfNotExists(product, "price", OType.STRING);
+        createPropertyIfNotExists(product, "price", OType.DOUBLE);
         createPropertyIfNotExists(product, "description", OType.STRING);
         createPropertyIfNotExists(product, "name", OType.STRING);
+        createPropertyIfNotExists(product, "section", OType.STRING); // i.e. Mens, Womens
+        createPropertyIfNotExists(product, "category", OType.STRING); // i.e. Shirts, Pants, Shoes
         createPropertyIfNotExists(product, "thumbnail", OType.STRING);
 
         createSampleProducts(); // Create new records using the products.json file
@@ -331,24 +403,30 @@ public class DatabaseController {
         createPropertyIfNotExists(order, "total", OType.STRING);
         createPropertyIfNotExists(order, "address", OType.STRING);
         createPropertyIfNotExists(order, "order_id", OType.LONG, true);
+        createPropertyIfNotExists(order, "shipping_type", OType.STRING);
 
         OClass user = createClassIfNotExists("User");
         createPropertyIfNotExists(product, "email", OType.STRING);
         createPropertyIfNotExists(product, "username", OType.STRING);
         createPropertyIfNotExists(product, "cart_contents", OType.STRING);
+        createPropertyIfNotExists(product, "shipping_option", OType.STRING);
+        createPropertyIfNotExists(product, "cart_discount", OType.STRING);
         createPropertyIfNotExists(product, "password", OType.STRING);
 
         OClass search = createClassIfNotExists("Search");
         createPropertyIfNotExists(product, "text", OType.STRING);
 
         System.out.println("Search: chair");
-        getSearchResults("chair");
+        getSearchResults("chair", null);
 
         System.out.println("Search: c");
-        getSearchResults("c");
+        getSearchResults("c", null);
 
         System.out.println("All products:");
         getAllProducts();
+
+        System.out.println("Mens products:");
+        getAllProductsInSection("Mens");
 
         System.out.println(createAccount("test_a@gmail.com", "John Doe", "a"));
         System.out.println(createAccount("test_b@gmail.com", "Jane Doe", "b"));
