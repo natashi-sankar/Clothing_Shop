@@ -1,14 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Page Title</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clothing Shop</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header>
+    <div class="logo">Clothing Shop</div>
+    <nav>
+      <ul>
+        <li><a href="#">HOME</a></li>
+        <li class="dropdown">
+          <a href="#">COLLECTION ▾</a>
+          <ul class="dropdown-content">
+            <li><a href="#" data-target="men">Men</a></li>
+            <li><a href="#" data-target="women">Women</a></li>
+            <li><a href="#" data-target="kids">Kids</a></li>
+            <li><a href="#" data-target="accessories">Accessories</a></li>
+          </ul>
 
-    <form action="backend/index.php" method="POST">
-    <h1>Welcome to My Website</h1>
-    <p>This is a basic paragraph in the body of the HTML document.</p>
+        </li>
+        <li><a href="#">CONTACT</a></li>
+      </ul>
+    </nav>
+
+    <div class="icons">
+      <a href="search.html"><span>🔍</span></a>
+      <a href="login.html"><span>👤</span></a>
+      <a href="wishlist.html"><span>❤️</span></a>
+      <a href="#"><span>🛒</span></a>
+    </div>
+
+  </header>
+
+  <section class="hero">
+    <div class="slider">
+      <div class="slides active" style="background-image: url('images/Home/home1.jpg');">
+        <div class="hero-text">
+          <h1>New Drop</h1>
+          <button>SHOP NOW</button>
+        </div>
+      </div>
+      <div class="slides" style="background-image: url('images/Home/home2.jpg');">
+        <div class="hero-text">
+          <h1>Streetwear Style</h1>
+        </div>
+      </div>
+    </div>
+    <div class="dots">
+      <span class="dot active" onclick="currentSlide(0)"></span>
+      <span class="dot" onclick="currentSlide(1)"></span>
+    </div>
+  </section>
+
+  <section class="collections" id="home-collections">
+  <h2>SHOP BY COLLECTION</h2>
+  <div class="collection-grid">
+    <div class="collection-card">
+      <img src="images/men/oversized T-shirt.jpg" alt="Men Oversized T-shirt">
+      <div class="label">Men’s Oversized T-shirt</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/women/oversized crop shirt.jpg" alt="Women's Crop Top">
+      <div class="label">Women's Crop Top</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/kids/picnic dress.jpg" alt="Kids picnic dress">
+      <div class="label">Kids picnic dress</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/accessories/hat.jpg" alt="Hat">
+      <div class="label">Hat</div>
+    </div>
+  </div>
+</section>
+
+  <!-- MEN'S COLLECTION -->
+<section class="collections" id="men">
+  <h2>Men's Collection</h2>
+  <div class="collection-grid">
+    <div class="collection-card">
+      <img src="images/Men/cozy sweatshirt.jpg" alt="Cozy sweatshirt">
+      <div class="label"> Cozy sweatshirt</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Men/Long Sleeve  button-up shirt.jpg" alt="Men Long Sleeve button-up shirt">
+      <div class="label"> Men Long Sleeve button-up shirt</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Men/oversized T-shirt.jpg" alt="Oversized T-Shirt">
+      <div class="label">Oversized T-Shirt</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Men/pants.jpg" alt="Men's pants">
+      <div class="label">Pants</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Men/shorts.jpg" alt="Men's shorts">
+      <div class="label">Shorts</div>
+    </div>
+  </div>
+</section>
+
+<!-- WOMEN'S COLLECTION -->
+<section class="collections" id="women" style="display:none;">
+  <h2>Women's Collection</h2>
+  <div class="collection-grid">
+    <div class="collection-card">
+      <img src="images/Women/2pcs set - Hoodie and sweatpants.jpg" alt="2pcs set - Hoodie and sweatpants">
+      <div class="label">2pcs set - Hoodie and sweatpants</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Women/oversized crop shirt.jpg" alt="Oversized crop shirt">
+      <div class="label">Crop Top</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Women/oversized T-shirt.jpg" alt="Oversized T-shirt">
+      <div class="label">Oversized T-shirt</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Women/Pleated wide leg pants.jpg" alt="Pleated wide leg pants">
+      <div class="label">Pleated wide leg pants</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Women/zebra patterned viscose shirt and pants set.jpg" alt="zebra patterned viscose shirt and pants set">
+      <div class="label">zebra patterned viscose shirt and pants set</div>
+    </div>
+  </div>
+</section>
+
+<!-- KIDS' COLLECTION -->
+<section class="collections" id="kids" style="display:none;">
+  <h2>Kids' Collection</h2>
+  <div class="collection-grid">
+    <div class="collection-card">
+      <img src="images/Kids/2pcs - shirt and pants.jpg" alt="2pcs - shirt and pants">
+      <div class="label">2pcs - shirt and pants set</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Kids/picnic dress.jpg" alt="Picnic dress">
+      <div class="label">Picnic dress</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Kids/2pcs - T-shirt and pants.jpg" alt="2pcs - T-shirt and pants">
+      <div class="label">2pcs - T-shirt and pants set</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Kids/Hoodie.jpg" alt="Kid's Hoodie">
+      <div class="label">Kid's Hoodie</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Kids/striped button-up shirt.jpg" alt="Striped button-up shirt">
+      <div class="label">Striped button-up shirt</div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESSORIES -->
+<section class="collections" id="accessories" style="display:none;">
+  <h2>Accessories</h2>
+  <div class="collection-grid">
+    <div class="collection-card">
+      <img src="images/Accessories/earrings.jpg" alt="Earrings">
+      <div class="label">Earrings</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Accessories/hat.jpg" alt="Hat">
+      <div class="label">Hat</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Accessories/necklace.jpg" alt="Necklace">
+      <div class="label">Necklace</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Accessories/Scarf.jpg" alt="Scarf">
+      <div class="label">Scarf</div>
+    </div>
+    <div class="collection-card">
+      <img src="images/Accessories/Sunglasses.jpg" alt="Sunglasses">
+      <div class="label">Sunglasses</div>
+    </div>
+  </div>
+</section>
+
+<div id="product-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <img id="modal-image" src="" alt="Product Image" />
+    <h2 id="modal-title"></h2>
+    <p id="modal-price"></p>
+    <div class="sizes" id="modal-sizes"></div>
+    <button class="add-to-cart">Add to Cart 🛒</button>
+  </div>
+</div>
+
+
+  <footer>
+    <p>&copy; 2025 Clothing Shop. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

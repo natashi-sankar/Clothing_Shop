@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Clothing Shop</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: #f9f9f9;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    header .logo a {
+      font-size: 24px;
+      font-weight: bold;
+      text-decoration: none;
+      color: #000;
+    }
+
+    header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+    }
+
+    header nav ul li a {
+      text-decoration: none;
+      color: #000;
+      font-weight: 500;
+    }
+
+    header .icons span {
+      font-size: 22px;
+      margin-left: 15px;
+      cursor: pointer;
+    }
+
+    .login-container {
+      width: 400px;
+      margin: 120px auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .login-container h1 {
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+
+    .login-container button {
+      width: 100%;
+      padding: 12px;
+      background: #222;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .login-container button:hover {
+      background: #444;
+    }
+
+    .profile-section {
+      display: none;
+      text-align: left;
+    }
+
+    .profile-info {
+      background: #fafafa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .profile-info h2 {
+      margin: 0 0 10px;
+    }
+
+    .edit-btn {
+      background: #007BFF;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .edit-btn:hover {
+      background: #0056b3;
+    }
+
+    .purchase-history {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .purchase-item {
+      background: #fafafa;
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .logout-btn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      background: #d33;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><a href="index.html">Clothing Shop</a></div>
+    <nav>
+      <ul>
+        <li><a href="index.html">HOME</a></li>
+      </ul>
+    </nav>
+    <div class="icons">
+      <a href="search.html"><span>🔍</span></a>
+      <a href="login.html"><span>👤</span></a>
+      <a href="wishlist.html"><span>❤️</span></a>
+      <a href="#"><span>🛒</span></a>
+    </div>
+  </header>
+
+  <div class="login-container">
+    <h1>Login</h1>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button id="login-btn">Login</button>
+    </div>
+
+    <!-- PROFILE SECTION -->
+    <div class="profile-section" id="profile-section">
+      <div class="profile-info">
+        <h2 id="display-username"></h2>
+        <button class="edit-btn" id="edit-btn">Edit Profile</button>
+      </div>
+
+      <div class="purchase-history" id="purchase-history">
+        <h3>Your Purchase History</h3>
+        <div class="purchase-item">No purchases yet.</div>
+      </div>
+
+      <button class="logout-btn" id="logout-btn">Logout</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Clothing Shop. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const editBtn = document.getElementById("edit-btn");
+    const form = document.getElementById("login-form");
+    const profileSection = document.getElementById("profile-section");
+    const displayUsername = document.getElementById("display-username");
+
+    loginBtn.addEventListener("click", () => {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+
+      if (user && pass) {
+        form.style.display = "none";
+        profileSection.style.display = "block";
+        displayUsername.textContent = `👤 ${user}`;
+      } else {
+        alert("Please enter both username and password.");
+      }
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      form.style.display = "block";
+      profileSection.style.display = "none";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+    });
+
+    editBtn.addEventListener("click", () => {
+      alert("Edit profile feature coming soon!");
+    });
+  </script>
+</body>
+</html>
