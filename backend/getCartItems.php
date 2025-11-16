@@ -2,8 +2,8 @@
 
 //Retrieves all cart items based on user email
 $servername = "localhost";
-$username = "admin";
-$password = "password";
+$username = "root";
+$password = "";
 $dbname = "ClothingStore";
 
 $customeremail = "John@test.com";

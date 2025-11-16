@@ -5,8 +5,8 @@
 //This should be run to set up the Database and tables for the clothing store.
 
 $servername = "localhost";
-$username = "admin";
-$password = "password";
+$username = "root";
+$password = "";
 $dbname = "ClothingStore";
 
 //Try to create the database
