@@ -1,6 +1,7 @@
 
 // SLIDESHOW 
 // ==========================
+
 let current = 0;
 const slides = document.querySelectorAll(".slides");
 const dots = document.querySelectorAll(".dot");
@@ -422,7 +423,7 @@ const Cart = {
   // ==========================
   // CHECKOUT: fake payment
   // ==========================
-  handleCheckout() {
+  async handleCheckout() {
     const cart = this.loadCart();
     if (cart.items.length === 0) {
       alert("Your cart is empty.");
@@ -456,22 +457,44 @@ const Cart = {
       return;
     }
 
-    // fake "payment" success
-    const emptied = this.defaultCart();
-    this.saveCart(emptied);
+    const totals = this.calculateTotals();
+    const orderForm = document.getElementById("checkout-form");
 
-    this.renderCart();
-    this.renderMiniCart();
-    this.renderCheckoutSummary();
-    this.updateCartCountBadge();
+    orderData = new FormData(orderForm);
+    orderData.append("cart", JSON.stringify(cart.items));
+    orderData.append("totals", JSON.stringify(totals));
+    orderData.append("discount_code", cart.discountCode || "");
+    orderData.append("shipping_method", cart.shippingMethod || "");
+    orderData.append("address", address + ", " + city + ", " + state + " " + zip);
 
-    if (messageEl) {
-      messageEl.textContent = "Payment successful! Thank you for your order.";
-      messageEl.style.color = "green";
+    let result = await fetch("backend/placeOrder.php", {
+        method: "POST",
+        body: orderData
+    });
+
+    let resultData = await result.json();
+    alert(resultData.msg);
+
+    if(resultData.success){
+
+      // fake "payment" success
+      const emptied = this.defaultCart();
+      this.saveCart(emptied);
+
+      this.renderCart();
+      this.renderMiniCart();
+      this.renderCheckoutSummary();
+      this.updateCartCountBadge();
+
+      if (messageEl) {
+        messageEl.textContent = "Payment successful! Thank you for your order.";
+        messageEl.style.color = "green";
+      }
+
+      const form = document.getElementById("checkout-form");
+      if (form) form.reset();
+      
     }
-
-    const form = document.getElementById("checkout-form");
-    if (form) form.reset();
   },
 
   // ==========================

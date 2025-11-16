@@ -17,6 +17,7 @@ try {
 
   //Drops the database if it exists, then creates a new one.
   $sql = "
+  DROP DATABASE IF EXISTS ClothingStore;
   CREATE DATABASE ClothingStore;";
   // use exec() because no results are returned
   $conn->exec($sql);
@@ -55,13 +56,31 @@ try {
   PRIMARY KEY (email)
   );
 
-  CREATE TABLE Orders (
+
+  CREATE TABLE `Order` (
   id BIGINT UNSIGNED AUTO_INCREMENT NOT NULL,
+  email VARCHAR(50) NOT NULL,
   addr VARCHAR(50) NOT NULL,
   total FLOAT NOT NULL,
+  tax FLOAT NULL NULL,
+  discount_amount FLOAT NULL NULL,
+  shipping_amount FLOAT NULL NULL,
+  subtotal FLOAT NULL NULL,
+  discount_code VARCHAR(50) NOT NULL,
   shipping_type VARCHAR(20) NOT NULL,
   purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  FOREIGN KEY (email) REFERENCES User(email)
+  );
+
+  CREATE TABLE OrderItem (
+  id BIGINT UNSIGNED AUTO_INCREMENT NOT NULL,
+  order_id BIGINT UNSIGNED NOT NULL,
+  product_id BIGINT UNSIGNED NOT NULL,
+  quantity INT UNSIGNED NOT NULL,
+  price FLOAT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (order_id) REFERENCES `Order`(id)
   );
 
   
@@ -69,6 +88,7 @@ try {
   id BIGINT UNSIGNED AUTO_INCREMENT NOT NULL,
   user_email VARCHAR(50),
   product_id BIGINT UNSIGNED,
+  quantity INT UNSIGNED NOT NULL DEFAULT 1,
   PRIMARY KEY (id),
   FOREIGN KEY (user_email) REFERENCES User(email),
   FOREIGN KEY (product_id) REFERENCES Product(id)

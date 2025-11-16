@@ -21,6 +21,7 @@ try {
 
         if($user){
             $_SESSION['username'] = $user['username'];
+            $_SESSION['email'] = $user['email'];
 
             echo json_encode(["success" => true]);
             exit;

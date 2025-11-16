@@ -451,6 +451,23 @@
       document.getElementById('returnMsg').style.display = 'block';
       returnForm.reset();
     });
+
+    // PURCHASE HISTORY
+
+    async function showPurchaseHistory() {
+      const res = await fetch("backend/getOrders.php");
+      const data = await res.json();
+
+      if(data.success) {
+        // replace this with purchase display code
+        console.log(data.orders);
+      } else {
+        alert(data.msg);
+      }
+    }
+
+    showPurchaseHistory()
+
   </script>
 </body>
 </html>
