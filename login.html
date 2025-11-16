@@ -337,21 +337,70 @@
     const profileSection = document.getElementById("profile-section");
     const displayUsername = document.getElementById("display-username");
 
-    loginBtn.addEventListener("click", () => {
+    async function showLoggedIn() {
+      let sessionResult = await fetch("backend/getSessionData.php", {
+          method: "POST",
+      });
+
+      let sessionData = await sessionResult.json();
+      let username = sessionData.username;
+      
+      if(username != null){
+        form.style.display = "none";
+        profileSection.style.display = "block";
+        displayUsername.textContent = `👤 ${username}`;
+        updateStatus(0);
+      }
+    }
+
+    showLoggedIn();
+    loginBtn.addEventListener("click", async () => {
       const user = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
 
       if (user && pass) {
-        form.style.display = "none";
-        profileSection.style.display = "block";
-        displayUsername.textContent = `👤 ${user}`;
-        updateStatus(0);
+
+        let data = new FormData();
+        data.append("username", user)
+        data.append("pass", pass)
+
+        let result = await fetch("backend/login.php", {
+            method: "POST",
+            body: data
+        });
+
+        let resultData = await result.json();
+        
+        if(resultData.success){
+          showLoggedIn();
+        } else {
+          let createAcc = true;
+
+          if(!createAcc){
+            alert(resultData.msg);
+          } else {
+            // create account process, this can be copied and put on the create account page
+
+            let result = await fetch("backend/createAccount.php", {
+              method: "POST",
+              body: data
+            });
+
+            let resultData = await result.json();
+            alert(resultData.msg);
+          }
+        }
+        
       } else {
         alert("Please enter both username and password.");
       }
     });
 
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener("click", async () => {
+      await fetch("backend/logout.php", {
+          method: "POST",
+      });
+
       form.style.display = "block";
       profileSection.style.display = "none";
       document.getElementById("username").value = "";
