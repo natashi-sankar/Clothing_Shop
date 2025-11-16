@@ -140,6 +140,110 @@
       margin-top: 50px;
       color: #666;
     }
+
+    /* ---- Order Tracker Additions ---- */
+    .order-tracker {
+      margin-top: 30px;
+      text-align: center;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .status-step {
+      text-align: center;
+      width: 30%;
+      position: relative;
+    }
+
+    .status-step::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: -50%;
+      width: 100%;
+      height: 4px;
+      background: #ccc;
+      z-index: 0;
+    }
+
+    .status-step:first-child::before {
+      display: none;
+    }
+
+    .status-circle {
+      width: 30px;
+      height: 30px;
+      background: #ccc;
+      border-radius: 50%;
+      margin: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .status-step.active .status-circle {
+      background: #28a745;
+    }
+
+    .status-step.active p {
+      font-weight: bold;
+      color: #28a745;
+    }
+
+    #notification {
+      background: #e9f5ee;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    /* ---- Returns & Exchanges ---- */
+    .returns {
+      margin-top: 30px;
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
+    }
+
+    .returns h3 {
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .returns form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .returns input, .returns textarea, .returns select {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .returns button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .returns button:hover {
+      background: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -179,6 +283,43 @@
         <h3>Your Purchase History</h3>
         <div class="purchase-item">No purchases yet.</div>
       </div>
+      <!-- ORDER TRACKING SECTION ADDED HERE -->
+      <div class="order-tracker">
+        <h3>Order Tracking</h3>
+        <div class="status">
+          <div class="status-step" id="processing">
+            <div class="status-circle"></div>
+            <p>Processing</p>
+          </div>
+          <div class="status-step" id="shipped">
+            <div class="status-circle"></div>
+            <p>Shipped</p>
+          </div>
+          <div class="status-step" id="delivered">
+            <div class="status-circle"></div>
+            <p>Delivered</p>
+          </div>
+        </div>
+        <div id="notification"></div>
+      </div>
+
+      <!-- RETURNS & EXCHANGES SECTION -->
+      <div class="returns">
+        <h3>Returns & Exchanges</h3>
+        <form id="returnForm">
+          <input type="text" id="orderNumber" placeholder="Order Number" required>
+          <select id="reason" required>
+            <option value="">Select Reason</option>
+            <option value="damaged">Damaged Item</option>
+            <option value="wrong">Wrong Item Received</option>
+            <option value="size">Wrong Size</option>
+            <option value="other">Other</option>
+          </select>
+          <textarea id="details" rows="3" placeholder="Describe your issue..."></textarea>
+          <button type="submit">Submit Request</button>
+        </form>
+        <p id="returnMsg" style="color:green; display:none;">Your return/exchange request has been submitted!</p>
+      </div>
 
       <button class="logout-btn" id="logout-btn">Logout</button>
     </div>
@@ -196,6 +337,23 @@
     const profileSection = document.getElementById("profile-section");
     const displayUsername = document.getElementById("display-username");
 
+    async function showLoggedIn() {
+      let sessionResult = await fetch("backend/getSessionData.php", {
+          method: "POST",
+      });
+
+      let sessionData = await sessionResult.json();
+      let username = sessionData.username;
+      
+      if(username != null){
+        form.style.display = "none";
+        profileSection.style.display = "block";
+        displayUsername.textContent = `👤 ${username}`;
+        updateStatus(0);
+      }
+    }
+
+    showLoggedIn();
     loginBtn.addEventListener("click", async () => {
       const user = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
@@ -214,9 +372,7 @@
         let resultData = await result.json();
         
         if(resultData.success){
-          form.style.display = "none";
-          profileSection.style.display = "block";
-          displayUsername.textContent = `👤 ${user}`;
+          showLoggedIn();
         } else {
           let createAcc = true;
 
@@ -240,7 +396,11 @@
       }
     });
 
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener("click", async () => {
+      await fetch("backend/logout.php", {
+          method: "POST",
+      });
+
       form.style.display = "block";
       profileSection.style.display = "none";
       document.getElementById("username").value = "";
@@ -249,6 +409,47 @@
 
     editBtn.addEventListener("click", () => {
       alert("Edit profile feature coming soon!");
+    });
+
+    //  ORDER TRACKING + NOTIFICATION LOGIC
+    const steps = ['processing', 'shipped', 'delivered'];
+    const notificationBox = document.getElementById('notification');
+
+    function updateStatus(stepIndex) {
+      steps.forEach((id, index) => {
+        const el = document.getElementById(id);
+        if (index <= stepIndex) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      });
+
+      const status = steps[stepIndex].charAt(0).toUpperCase() + steps[stepIndex].slice(1);
+      showNotification(`Your order status has changed to: ${status}`);
+      console.log(`Email/SMS notification sent for status: ${status}`);
+
+      // Simulated backend timing
+      if (stepIndex === 0) {
+        setTimeout(() => updateStatus(1), 10 * 1000); // 10s for demo (replace with 10 min = 10 * 60 * 1000)
+        setTimeout(() => updateStatus(2), 30 * 1000); // 30s for demo (replace with 24hr = 24 * 60 * 60 * 1000)
+      }
+    }
+
+    function showNotification(msg) {
+      notificationBox.textContent = msg;
+      notificationBox.style.display = 'block';
+      setTimeout(() => {
+        notificationBox.style.display = 'none';
+      }, 4000);
+    }
+
+    //  RETURNS FORM
+    const returnForm = document.getElementById('returnForm');
+    returnForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      document.getElementById('returnMsg').style.display = 'block';
+      returnForm.reset();
     });
   </script>
 </body>

@@ -20,7 +20,6 @@ try {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if($user){
-            $_SESSION['login_successful'] = true;
             $_SESSION['username'] = $user['username'];
 
             echo json_encode(["success" => true]);

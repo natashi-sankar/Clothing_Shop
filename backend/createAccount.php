@@ -1,5 +1,8 @@
 <?php
 
+$customer_username = $_POST['username'] ?? '';
+$customer_password = $_POST['pass'] ?? '';
+
 $servername = "localhost";
 $username = "root";
 $password = "";
