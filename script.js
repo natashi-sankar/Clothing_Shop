@@ -39,24 +39,6 @@ document.querySelectorAll('.dropdown-content a').forEach(link => {
   });
 });
 
-document.querySelectorAll('.dropdown-content a').forEach(link => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    const target = e.target.getAttribute('data-target');
-
-    document.querySelector('.hero').style.display = 'none';
-    document.querySelectorAll('.collections').forEach(section => {
-      section.style.display = 'none';
-    });
-
-    const showSection = document.getElementById(target);
-    if (showSection) {
-      showSection.style.display = 'block';
-      window.scrollTo({ top: showSection.offsetTop - 60, behavior: 'smooth' });
-    }
-  });
-});
-
 document.querySelector('nav a[href="#"]').addEventListener('click', (e) => {
   e.preventDefault();
 
@@ -120,6 +102,7 @@ const prices = {
   accessories: 19.99
 };
 
+
 document.querySelectorAll('.collection-card img').forEach(img => {
   img.addEventListener('click', (e) => {
     const section = e.target.closest('section').id;
@@ -130,7 +113,6 @@ document.querySelectorAll('.collection-card img').forEach(img => {
     modalTitle.textContent = productName;
     modalPrice.textContent = `$${price.toFixed(2)}`;
 
- 
     modalSizes.innerHTML = '';
 
     if (section === 'accessories') {

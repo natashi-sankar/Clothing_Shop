@@ -6,55 +6,24 @@
   <title>Search | Clothing Shop</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .search-container {
-      margin: 150px auto;
-      text-align: center;
-    }
-
-    .search-container h1 {
-      margin-bottom: 20px;
-    }
-
-    .search-container input {
-      width: 60%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      margin-right: 10px;
-    }
-
-    .search-container button {
-      padding: 12px 20px;
-      background: #222;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .search-container button:hover {
-      background: #444;
-    }
-
-    .results {
-      margin-top: 40px;
-    }
-
-    .results p {
-      color: #777;
-    }
+    .search-container { margin: 150px auto; text-align: center; }
+    .search-container input { width: 60%; padding: 12px; border-radius: 10px; }
+    .search-container button { padding: 12px 20px; border-radius: 10px; cursor: pointer; }
+    .results { margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .product-card { border: 1px solid #ccc; border-radius: 10px; padding: 10px; cursor: pointer; text-align: center; }
+    .product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+    .product-card h3 { margin: 10px 0 5px; font-size: 16px; }
+    .product-card p { margin: 0; color: #555; }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo"><a href="index.html" style="text-decoration:none;color:#000;">Clothing Shop</a></div>
+    <div class="logo"><a href="index.html">Clothing Shop</a></div>
     <nav>
       <ul>
         <li><a href="index.html">HOME</a></li>
       </ul>
     </nav>
-
     <div class="icons">
       <a href="search.html"><span>🔍</span></a>
       <a href="login.html"><span>👤</span></a>
@@ -73,21 +42,120 @@
     </div>
   </div>
 
+  <div id="product-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <img id="modal-image" src="" alt="Product Image" />
+      <h2 id="modal-title"></h2>
+      <p id="modal-price"></p>
+      <div class="sizes" id="modal-sizes"></div>
+      <div class="modal-actions">
+        <span id="wishlist-heart" class="wishlist-heart">♡</span>
+        <button class="add-to-cart">Add to Cart 🛒</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <p>&copy; 2025 Clothing Shop. All rights reserved.</p>
   </footer>
 
-  <script>
-    function search() {
-      const query = document.getElementById("searchInput").value.trim();
-      const results = document.getElementById("results");
+<script>
+const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+let currentProduct = null;
 
-      if (!query) {
-        results.innerHTML = "<p>Please enter something to search.</p>";
-      } else {
-        results.innerHTML = `<p>Showing results for "<strong>${query}</strong>"</p>`;
-      }
-    }
-  </script>
+const products = [
+  { title: "Cozy sweatshirt", section: "men", image: "images/Men/cozy sweatshirt.jpg", price: 49.99 },
+  { title: "Men Long Sleeve button-up shirt", section: "men", image: "images/Men/Long Sleeve  button-up shirt.jpg", price: 49.99 },
+  { title: "Oversized T-Shirt", section: "men", image: "images/Men/oversized T-shirt.jpg", price: 49.99 },
+  { title: "Pants", section: "men", image: "images/Men/pants.jpg", price: 49.99 },
+  { title: "Shorts", section: "men", image: "images/Men/shorts.jpg", price: 49.99 },
+  { title: "2pcs set - Hoodie and sweatpants", section: "women", image: "images/Women/2pcs set - Hoodie and sweatpants.jpg", price: 59.99 },
+  { title: "Crop Top", section: "women", image: "images/Women/oversized crop shirt.jpg", price: 44.99 },
+  { title: "Oversized T-shirt", section: "women", image: "images/Women/oversized T-shirt.jpg", price: 44.99 },
+  { title: "Pleated wide leg pants", section: "women", image: "images/Women/Pleated wide leg pants.jpg", price: 49.99 },
+  { title: "zebra patterned viscose shirt and pants set", section: "women", image: "images/Women/zebra patterned viscose shirt and pants set.jpg", price: 69.99 },
+  { title: "2pcs - shirt and pants set", section: "kids", image: "images/Kids/2pcs - shirt and pants.jpg", price: 29.99 },
+  { title: "Picnic dress", section: "kids", image: "images/Kids/picnic dress.jpg", price: 29.99 },
+  { title: "2pcs - T-shirt and pants set", section: "kids", image: "images/Kids/2pcs - T-shirt and pants.jpg", price: 29.99 },
+  { title: "Kid's Hoodie", section: "kids", image: "images/Kids/Hoodie.jpg", price: 29.99 },
+  { title: "Striped button-up shirt", section: "kids", image: "images/Kids/striped button-up shirt.jpg", price: 29.99 },
+  { title: "Earrings", section: "accessories", image: "images/Accessories/earrings.jpg", price: 19.99 },
+  { title: "Hat", section: "accessories", image: "images/Accessories/hat.jpg", price: 19.99 },
+  { title: "Necklace", section: "accessories", image: "images/Accessories/necklace.jpg", price: 24.99 },
+  { title: "Scarf", section: "accessories", image: "images/Accessories/Scarf.jpg", price: 14.99 },
+  { title: "Sunglasses", section: "accessories", image: "images/Accessories/Sunglasses.jpg", price: 29.99 },
+];
+
+const modal = document.getElementById('product-modal');
+const modalImg = document.getElementById('modal-image');
+const modalTitle = document.getElementById('modal-title');
+const modalPrice = document.getElementById('modal-price');
+const modalSizes = document.getElementById('modal-sizes');
+const closeBtn = document.querySelector('.close-btn');
+const heart = document.getElementById('wishlist-heart');
+
+function updateHeartIcon() {
+  if (!currentProduct) return;
+  const exists = wishlist.some(item => item.title === currentProduct.title);
+  heart.textContent = exists ? "❤️" : "♡";
+  heart.classList.toggle("active", exists);
+}
+
+heart.addEventListener('click', () => {
+  if (!currentProduct) return;
+  const index = wishlist.findIndex(item => item.title === currentProduct.title);
+  if (index === -1) wishlist.push(currentProduct);
+  else wishlist.splice(index, 1);
+  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  updateHeartIcon();
+});
+
+closeBtn.onclick = () => modal.style.display = 'none';
+window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+function search() {
+  const query = document.getElementById("searchInput").value.trim().toLowerCase();
+  const results = document.getElementById("results");
+  if (!query) { results.innerHTML = "<p>Please enter something to search.</p>"; return; }
+
+  const matched = products.filter(p => p.title.toLowerCase().includes(query));
+  if (!matched.length) { results.innerHTML = `<p>No results for "<strong>${query}</strong>"</p>`; return; }
+
+  results.innerHTML = matched.map(product => `
+    <div class="product-card" onclick='openModal(${JSON.stringify(product)})'>
+      <img src="${product.image}" alt="${product.title}" />
+      <h3>${product.title}</h3>
+      <p>$${product.price.toFixed(2)}</p>
+    </div>
+  `).join('');
+}
+
+function openModal(product) {
+  currentProduct = product;
+  modalImg.src = product.image;
+  modalTitle.textContent = product.title;
+  modalPrice.textContent = `$${product.price.toFixed(2)}`;
+  modalSizes.innerHTML = '';
+
+  const sizes = (product.section === "accessories") ? ["One Size"] : ["XS","S","M","L","XL"];
+  sizes.forEach(size => {
+    const btn = document.createElement('button');
+    btn.textContent = size;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sizes button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    modalSizes.appendChild(btn);
+  });
+
+  updateHeartIcon();
+  modal.style.display = 'flex';
+}
+
+document.getElementById("searchInput").addEventListener("input", search);
+</script>
+
+<script src="wishlist.js"></script>
 </body>
 </html>
