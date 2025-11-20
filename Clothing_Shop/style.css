@@ -391,27 +391,7 @@ header a:focus {
   color: white;
 }
 
-
-.wishlist-heart {
-  font-size: 36px;
-  cursor: pointer;
-  margin-right: 15px;
-  user-select: none;
-}
-
-.wishlist-heart.active {
-  color: red;
-}
-.modal-actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  margin-top: 15px;
-}
-
 /* Modal add-to-cart button */
-
 
 .add-to-cart {
   background-color: black;

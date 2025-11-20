@@ -58,8 +58,6 @@ document.querySelectorAll(".dropdown-content a").forEach((link) => {
   });
 });
 
-document.querySelector('nav a[href="#"]').addEventListener('click', (e) => {
-  e.preventDefault();
 // ==========================
 // "HOME" 
 // ==========================
@@ -77,7 +75,6 @@ if (homeNavLink) {
 
     const homeCollections = document.getElementById("home-collections");
     if (homeCollections) homeCollections.style.display = "block";
-
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
@@ -145,12 +142,6 @@ const prices = {
   accessories: 19.99,
 };
 
-
-document.querySelectorAll('.collection-card img').forEach(img => {
-  img.addEventListener('click', (e) => {
-    const section = e.target.closest('section').id;
-    const productName = e.target.alt;
-    const price = prices[section] || 39.99;
 if (modal && modalImg && modalTitle && modalPrice && modalSizes) {
   document.querySelectorAll(".collection-card img").forEach((img) => {
     img.addEventListener("click", (e) => {
@@ -204,6 +195,7 @@ if (closeBtn && modal) {
 const Cart = {
   cartKey: "clothingShopCart",
 
+  // ---------- STORAGE ----------
   defaultCart() {
     return {
       items: [],
@@ -524,8 +516,6 @@ const Cart = {
       subtotalEl.textContent = "0.00";
       return;
     }
-
-    modalSizes.innerHTML = '';
 
     cart.items.forEach((item) => {
       const div = document.createElement("div");

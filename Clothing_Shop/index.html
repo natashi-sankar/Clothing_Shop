@@ -41,6 +41,7 @@
       <div class="slides active" style="background-image: url('images/Home/home1.jpg');">
         <div class="hero-text">
           <h1>New Drop</h1>
+          <button>SHOP NOW</button>
         </div>
       </div>
       <div class="slides" style="background-image: url('images/Home/home2.jpg');">
@@ -230,109 +231,10 @@
     </div>
   </div>
 
-</section>
-
-<div id="product-modal" class="modal">
-  <div class="modal-content">
-    <span class="close-btn">&times;</span>
-    <img id="modal-image" src="" alt="Product Image" />
-    <h2 id="modal-title"></h2>
-    <p id="modal-price"></p>
-    <div class="sizes" id="modal-sizes"></div>
-    <div class="modal-actions">
-    <span id="wishlist-heart" class="wishlist-heart">♡</span>
-    <button class="add-to-cart">Add to Cart 🛒</button>
-</div>
-  </div>
-</div>
-
-
   <footer>
     <p>&copy; 2025 Clothing Shop. All rights reserved.</p>
   </footer>
 
   <script src="script.js"></script>
-  <script src="wishlist.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const modal = document.getElementById('product-modal');
-      const modalImg = document.getElementById('modal-image');
-      const modalTitle = document.getElementById('modal-title');
-      const modalPrice = document.getElementById('modal-price');
-      const modalSizes = document.getElementById('modal-sizes');
-      const closeBtn = document.querySelector('.close-btn');
-      const heart = document.getElementById('wishlist-heart');
-
-      const prices = { men: 49.99, women: 44.99, kids: 29.99, accessories: 19.99 };
-      let currentProduct = null;
-
-      let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-      function saveWishlist() { localStorage.setItem("wishlist", JSON.stringify(wishlist)); }
-      function toggleWishlist(product) {
-        const index = wishlist.findIndex(item => item.title === product.title);
-        if (index === -1) wishlist.push(product);
-        else wishlist.splice(index, 1);
-        saveWishlist();
-      }
-      function isInWishlist(product) {
-        return wishlist.some(item => item.title === product.title);
-      }
-
-  function updateHeartIcon() {
-    if (!currentProduct) return;
-    heart.textContent = isInWishlist(currentProduct) ? "❤️" : "♡";
-  }
-
-  function openModal(product) {
-    currentProduct = product;
-    modalImg.src = product.image;
-    modalTitle.textContent = product.title;
-    modalPrice.textContent = `$${product.price.toFixed(2)}`;
-    modalSizes.innerHTML = '';
-
-    if (product.section === 'accessories') {
-      const btn = document.createElement('button');
-      btn.textContent = 'One Size';
-      btn.classList.add('active');
-      modalSizes.appendChild(btn);
-    } else {
-      ['XS','S','M','L','XL'].forEach(size => {
-        const btn = document.createElement('button');
-        btn.textContent = size;
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.sizes button').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-        });
-        modalSizes.appendChild(btn);
-      });
-    }
-
-    updateHeartIcon();
-    modal.style.display = 'flex';
-  }
-
-      heart.addEventListener('click', () => {
-        if (!currentProduct) return;
-          toggleWishlist(currentProduct);
-          updateHeartIcon();
-      });
-
-      document.querySelectorAll('.collection-card img').forEach(img => {
-        img.addEventListener('click', e => {
-          const section = img.closest('section').id;
-          const product = {
-            title: img.alt,
-            image: img.src,
-            price: prices[section] || 39.99,
-            section: section
-          };
-        openModal(product);
-    });
-  });
-
-      closeBtn.onclick = () => modal.style.display = 'none';
-      window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
-    });
-</script>
 </body>
 </html>
