@@ -151,6 +151,9 @@ document.querySelectorAll('.collection-card img').forEach(img => {
     const section = e.target.closest('section').id;
     const productName = e.target.alt;
     const price = prices[section] || 39.99;
+      });
+    });
+    
 if (modal && modalImg && modalTitle && modalPrice && modalSizes) {
   document.querySelectorAll(".collection-card img").forEach((img) => {
     img.addEventListener("click", (e) => {
@@ -192,6 +195,7 @@ if (closeBtn && modal) {
   closeBtn.onclick = () => {
     modal.style.display = "none";
   };
+
 
   window.onclick = (e) => {
     if (e.target === modal) modal.style.display = "none";
@@ -758,4 +762,5 @@ const Cart = {
 
 document.addEventListener("DOMContentLoaded", () => {
   Cart.init();
+});
 });
