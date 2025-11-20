@@ -45,30 +45,7 @@
     .go-shopping-btn:hover {
       background: #444;
     }
-
-    .wishlist-item {
-      cursor: pointer;
-      background: #fff;
-      padding: 20px;
-      margin: 15px auto;
-      border-radius: 10px;
-      width: 350px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-    .wishlist-item img {
-      width: 100%;
-      border-radius: 10px;
-    }
-
-    .remove-heart {
-      font-size: 25px;
-      cursor: pointer;
-      color: red;
-    }
   </style>
-  <script src="wishlist.js" defer></script>
 </head>
 <body>
   <header>
@@ -89,20 +66,10 @@
 
   <div class="wishlist-container">
     <h1>My Wishlist</h1>
-    <div id="wishlist-content"></div>
-  </div>
-
-  <!-- Product Modal -->
-  <div id="product-modal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn">&times;</span>
-      <img id="modal-image" src="" alt="Product Image" />
-      <h2 id="modal-title"></h2>
-      <p id="modal-price"></p>
-      <div class="sizes" id="modal-sizes"></div>
-      <div class="modal-actions">
-        <span id="wishlist-heart" class="wishlist-heart">♡</span>
-        <button class="add-to-cart">Add to Cart 🛒</button>
+    <div id="wishlist-content">
+      <div class="empty-wishlist">
+        <p>Your wishlist is empty 😢</p>
+        <button class="go-shopping-btn" onclick="window.location.href='index.html'">Back To Shopping</button>
       </div>
     </div>
   </div>
@@ -112,3 +79,4 @@
   </footer>
 </body>
 </html>
+

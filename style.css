@@ -391,7 +391,6 @@ header a:focus {
   color: white;
 }
 
-
 .wishlist-heart {
   font-size: 36px;
   cursor: pointer;
@@ -411,7 +410,6 @@ header a:focus {
 }
 
 /* Modal add-to-cart button */
-
 
 .add-to-cart {
   background-color: black;
